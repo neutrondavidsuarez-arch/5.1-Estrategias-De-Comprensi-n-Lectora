@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioLearning - Tema 1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init({ publicKey: "3LjnpLaDboHWv0VPY" });
+        })();
+    </script>
+    <style>
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+        .iframe-container { position: relative; width: 100%; height: 75vh; border-radius: 1.5rem; overflow: hidden; box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
+        .nav-btn { transition: all 0.3s ease; border-bottom: 3px solid transparent; white-space: nowrap; }
+        .nav-btn:hover { transform: translateY(-2px); }
+        .nav-btn.active { border-color: #10b981; color: #10b981; }
+        @keyframes pulse-dot { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        .dot-pulse { animation: pulse-dot 1.2s infinite; }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans min-h-screen">
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex flex-col lg:flex-row justify-between items-center gap-4">
+                <div class="text-center lg:text-left">
+                    <h1 class="text-xl font-black text-emerald-600 tracking-tight">UNIDAD 1</h1>
+                    <p class="text-slate-500 font-bold text-xs uppercase">Tema 5.1: Estrategias de comprensión lectora</p>
+                </div>
+                
+                <nav class="flex flex-wrap justify-center gap-1 md:gap-4">
+                    <button onclick="prepQuiz('deber', this)" class="nav-btn active px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>📚</span> Practica
+                    </button>
+                    <button onclick="prepQuiz('evaluacion', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>📝</span> Repaso
+                    </button>
+                    <button onclick="prepQuiz('extra', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>📊</span> Evaluación
+                    </button>
+                    <button onclick="showSection('pdf', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>📋</span> Pizarra
+                    </button>
+                    <button onclick="showSection('video', this)" class="nav-btn px-3 py-2 font-bold text-slate-700 flex items-center gap-2">
+                        <span>🎥</span> Video
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <main id="app" class="max-w-5xl mx-auto p-6">
+    </main>
+    <script>
+        const DRIVE_PDF_URL = "https://drive.google.com/file/d/1oKFhVhjsDaVlPU7_QdpHiYMIZW7o-EA5/view?usp=sharing";
+        const DRIVE_VIDEO_URL = "https://drive.google.com/file/d/1kXTvamFJiq9f4YfCKyfidlinw5pK9VUS/view?usp=sharing";
+
+        // PRINCIPAL (Práctica + Repaso)
+        const quizData = [
+           { question: 'Metacognición <br> Indique si los siguientes enunciados son Verdaderos (V) o Falsos (F) según el texto. <br> 1. La metacognición se refiere únicamente a la velocidad de lectura. <br> 2. La planificación es una fase metacognitiva que se realiza antes de leer. <br> 3. La evaluación metacognitiva ocurre durante la lectura. <br> 4. La metacognición es una habilidad innata que no puede entrenarse.', options: ['V-V-V-V', 'F-V-F-F', 'V-F-V-F', 'F-V-F-V'], answer: 'F-V-F-F', explanation: 'Respuesta correcta: B) F-V-F-F <br> A) Falso: la metacognición no se limita a la velocidad de lectura; es la conciencia y regulación de los propios procesos cognitivos. <br> B) Verdadero: la planificación es la fase previa a la lectura. <br> C) Falso: la evaluación ocurre después de leer; durante la lectura se realiza la autorregulación. <br> D) Falso: la metacognición se puede entrenar y mejorar..', multi: 'OFF', maxSelect: 1 },
+            { question: 'Lectura denotativa y connotativa <br> Complete la analogía: <br> Denotativo es a literal como connotativo es a ________.', options: ['Objetivo', 'Simbólico', 'Explícito', 'Directo'], answer: 'Simbólico', explanation: 'Respuesta correcta: B) Simbólico <br> Denotativo = literal / Connotativo = simbólico (o figurado).', multi: 'OFF', maxSelect: 1 },
+            { question: 'Fases de la metacognición <br> Identifique el término que NO corresponde al grupo:', options: ['Planificación', 'Autorregulación', 'Evaluación', 'Inferencia'], answer: 'Inferencia', explanation: 'Respuesta correcta: D) Inferencia <br> Las fases metacognitivas son planificación, autorregulación y evaluación. La inferencia es un proceso de comprensión, no una fase metacognitiva.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias <br> Complete el siguiente texto: <br> "Las inferencias permiten al lector ________ lo que el texto no dice explícitamente, utilizando ________ previos y el ________."', options: ['interpretar – conocimientos – contexto', 'memorizar – datos – resumen', 'repetir – ejercicios – libro', 'subrayar – textos – diccionario'], answer: 'interpretar – conocimientos – contexto', explanation: 'Respuesta correcta: A) interpretar – conocimientos – contexto <br> Las inferencias permiten interpretar lo no dicho explícitamente usando conocimientos previos y el contexto.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Tipos de inferencias <br> Relacione cada tipo de inferencia con su descripción: <br> <b>Tipo de inferencia</b> <br> 1. Inductiva <br> 2. Deductiva <br> 3. Implícita <br> <b>Descripción</b> <br> A) Parte de una generalización para aplicarla a un caso particular. <br> B) Conecta información explícita con conocimientos previos. <br> C) Parte de datos particulares para llegar a una conclusión general.', options: ['1C - 2A - 3B', '1A - 2B - 3C', '1B - 2C - 3A', '1C - 2B - 3A'], answer: '1C - 2A - 3B', explanation: 'Respuesta correcta: A) 1c – 2a – 3b <br> Inductiva: de lo particular a lo general (c). <br> Deductiva: de lo general a lo particular (a). <br> Implícita: conecta información explícita con conocimientos previos (b)..', multi: 'OFF', maxSelect: 1 },
+            { question: 'Fases metacognitivas <br> Ordene las fases de la metacognición según su secuencia lógica: <br> 1. Evaluación <br> 2. Planificación <br> 3. Autorregulación <br> ', options: ['1-2-3', '2-3-1', '3-1-2', '2-1-3'], answer: '2-3-1', explanation: 'Respuesta correcta: B) 2-3-1 <br> Orden lógico: Planificación &rarr;  Autorregulación &rarr;  Evaluación..', multi: 'OFF', maxSelect: 1 },
+            { question: 'Metacognición <br> Lea el siguiente texto: <br> “Un lector metacognitivo, antes de comenzar a leer, establece objetivos, selecciona estrategias y evalúa su conocimiento previo.” <br> ¿A qué fase metacognitiva corresponde lo descrito?', options: ['Autorregulación', 'Evaluación', 'Planificación', 'Inferencia'], answer: 'Planificación', explanation: 'Respuesta correcta: C) Planificación <br> Establecer objetivos, seleccionar estrategias y evaluar conocimiento previo se hace antes de leer.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Lectura connotativa <br> Texto: “La paloma blanca voló sobre la ciudad destruida.” <br> ¿Qué significado connotativo puede tener “paloma blanca” en este contexto?', options: ['Un ave específica', 'Símbolo de paz y esperanza', 'Referencia a un personaje', 'Objeto decorativo'], answer: 'Símbolo de paz y esperanza', explanation: 'Respuesta correcta: B) Símbolo de paz y esperanza <br> En el contexto de una ciudad destruida, la “paloma blanca” adquiere un significado simbólico de paz y esperanza..', multi: 'OFF', maxSelect: 1 },
+            { question: 'Elementos implícitos <br> ¿Qué son las inferencias?', options: ['Estrategias para aumentar la velocidad de lectura.', 'Conclusiones que hacemos al conectar información explícita con conocimientos previos.', 'Técnicas para memorizar textos.', 'Sinónimos de palabras desconocidas.'], answer: 'Conclusiones que hacemos al conectar información explícita con conocimientos previos.', explanation: 'Respuesta correcta: B) Conclusiones que hacemos al conectar información explícita con conocimientos previos.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Lectura denotativa y connotativa <br> Seleccione dos características de la lectura connotativa: <br> 1. Se centra en significados literales. <br> 2. Explora significados simbólicos. <br> 3. Depende del contexto cultural. <br> 4. Ignora las emociones del lector.', options: ['1 y 2', '2 y 3', '3 y 4', '1 y 4'], answer: '2 y 3', explanation: 'Respuesta correcta: B) 2 y 3 <br> La lectura connotativa explora significados simbólicos y depende del contexto cultural.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Estrategias metacognitivas <br> Seleccione tres acciones propias de la fase de autorregulación: <br> 1. Establecer objetivos de lectura. <br> 2. Releer un párrafo confuso. <br> 3. Hacer una pausa si hay distracción. <br> 4. Evaluar si se comprendió el texto. <br> 5. Subrayar ideas principales. <br> 6. Buscar palabras desconocidas.', options: ['2, 3, 6', '1, 4, 5', '3, 5, 6', '1, 2, 4'], answer: '2, 3, 6', explanation: 'Respuesta correcta: A) 2, 3, 6 <br> Acciones de autorregulación (durante la lectura): releer un párrafo confuso, hacer una pausa si hay distracción y buscar palabras desconocidas.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias <br> Relacione la causa con su efecto: <br> Causa: Un lector no tiene conocimientos previos sobre el contexto histórico de un texto. <br> Efecto: …', options: ['Realiza inferencias precisas.', 'Comprende mejor el significado denotativo.', 'Puede cometer inferencias equivocadas.', 'Aumenta su velocidad de lectura.'], answer: 'Puede cometer inferencias equivocadas.', explanation: 'Respuesta correcta: C) Puede cometer inferencias equivocadas. <br> Sin conocimientos previos del contexto histórico es más fácil errar en las inferencias.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Proceso de lectura <br> Ordene las siguientes palabras para formar una frase clave del texto: <br> "proceso – lectura – es – interactivo – un"', options: ['Lectura es un proceso interactivo', 'Proceso interactivo es un lectura', 'Es un proceso interactivo lectura', 'Interactivo proceso es un lectura'], answer: 'Lectura es un proceso interactivo', explanation: 'Respuesta correcta: A) Lectura es un proceso interactivo.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Metacognición <br> Si un lector no logra entender un párrafo durante la lectura, ¿qué acción metacognitiva debería realizar?', options: ['Abandonar la lectura', 'Releer el párrafo o buscar ayuda', 'Saltarse el párrafo', 'Subrayar sin comprender'], answer: 'Releer el párrafo o buscar ayuda', explanation: 'Respuesta correcta: B) Releer el párrafo o buscar ayuda <br> Es una acción típica de autorregulación cuando no se comprende.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Lectura denotativa y connotativa <br> Indique si los siguientes enunciados son Verdaderos (V) o Falsos (F): <br> La lectura denotativa se basa en interpretaciones subjetivas. <br> La connotativa explora significados simbólicos. <br> Ambas son excluyentes. <br> La denotación es la base para la connotación.', options: ['F-V-F-V', 'V-F-V-F', 'F-V-V-F', 'V-V-F-F'], answer: 'F-V-F-V', explanation: 'Respuesta correcta: A) F-V-F-V <br> 1. Falso (la denotativa es objetiva/literal). <br> 2. Verdadero. <br> 3. Falso (no son excluyentes; se complementan). <br> 4. Verdadero (la denotación es la base sobre la que se construye la connotación).', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias <br> Complete la analogía: <br> Inductivo es a particular-general como deductivo es a ________.', options: ['general-particular', 'simple-complejo', 'implícito-explícito', 'objetivo-subjetivo'], answer: 'general-particular', explanation: 'Respuesta correcta: A) general-particular <br> Inductivo: particular &rarr;  general / Deductivo: general &rarr;  particular..', multi: 'OFF', maxSelect: 1 },
+            { question: 'Estrategias de inferencia <br> ¿Cuál NO es una estrategia para hacer inferencias?', options: ['Usar pistas contextuales', 'Conectar con conocimientos previos', 'Memorizar el texto completo', 'Hacer preguntas sobre lo implícito'], answer: 'Memorizar el texto completo', explanation: 'Respuesta correcta: C) Memorizar el texto completo <br> Memorizar no es una estrategia para inferir; las demás sí lo son.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Metacognición <br> Complete: <br> "La ________ es la capacidad de regular nuestros procesos de ________ y se desarrolla en tres fases: planificación, ________ y evaluación."', options: ['metacognición – pensamiento – autorregulación', 'inferencia – lectura – organización', 'lectura – aprendizaje – motivación', 'comprensión – escritura – revisión'], answer: 'metacognición – pensamiento – autorregulación', explanation: 'Respuesta correcta: A) metacognición – pensamiento – autorregulación.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Ejemplos de lectura denotativa y connotativa <br> Relacione cada frase con su tipo de lectura: <br> Frase <br> 1. “La sangre transporta oxígeno.” <br> 2. “La sangre significa pasión.” <br> Tipo de lectura <br> a) Connotativa <br> b) Denotativa <br> ', options: ['1a – 2b', '1b – 2a', '1a – 2a', '1b – 2b'], answer: '1b – 2a', explanation: 'Respuesta correcta: B) 1b – 2a <br> “La sangre transporta oxígeno” &rarr;  denotativa. <br> “La sangre significa pasión” &rarr;  connotativa.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Pasos para la planificación metacognitiva <br> Ordene los pasos de la planificación antes de leer: <br> 1. Seleccionar estrategias <br> 2. Establecer objetivos <br> 3. Evaluar conocimiento previo <br> 4. Organizar el contexto', options: ['2-1-3-4', '2-1-4-3', '3-2-1-4', '2-3-1-4'], answer: '2-3-1-4', explanation: 'Respuesta correcta: D) 2-3-1-4 <br> Establecer objetivos &rarr; Evaluar conocimiento previo &rarr; Seleccionar estrategias &rarr; Organizar el contexto.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Importancia de la metacognición <br> Según el texto, ¿por qué es importante la metacognición?', options: ['Porque aumenta la velocidad de lectura.', 'Porque desarrolla lectores autónomos y críticos.', 'Porque reemplaza la necesidad de inferencias.', 'Porque simplifica todos los textos.'], answer: 'Porque desarrolla lectores autónomos y críticos.', explanation: 'Respuesta correcta: B) Porque desarrolla lectores autónomos y críticos.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias <br> Texto: “María apagó las luces y se acurrucó en la cama al oír el viento golpear la ventana.” <br> ¿Qué se puede inferir?', options: ['María tiene calor.', 'María tiene miedo.', 'María está feliz.', 'María está cocinando.'], answer: 'María tiene miedo.', explanation: 'Respuesta correcta: B) María tiene miedo. <br> Apagar las luces y acurrucarse al oír el viento sugiere miedo o inquietud.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Lectura denotativa <br> ¿Cuál de las siguientes es una característica de la lectura denotativa?', options: ['Interpreta símbolos culturales.', 'Se basa en significados literales.', 'Explora emociones del autor.', 'Depende de la subjetividad del lector.'], answer: 'Se basa en significados literales.', explanation: 'Respuesta correcta: B) Se basa en significados literales.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Dificultades en inferencias <br> Seleccione dos dificultades comunes al hacer inferencias: <br> 1. Falta de conocimientos previos <br> 2. Lectura denotativa <br> 3. Exceso de planificación <br> 4. Inferencias equivocadas', options: ['1 y 2', '2 y 3', '3 y 4', '1 y 4'], answer: '1 y 4', explanation: 'Respuesta correcta: D) 1 y 4 <br> Las dificultades más comunes son la falta de conocimientos previos y las inferencias equivocadas.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Metacognición <br> Seleccione tres elementos que un lector metacognitivo considera en la fase de evaluación: <br> 1. ¿Logré mis objetivos? <br> 2. ¿Subrayé correctamente? <br> 3. ¿Puedo explicar el texto con mis palabras? <br> 4. ¿Debería haber releído más? <br> 5. ¿Dónde leeré? <br> 6. ¿Qué estrategia usaré?', options: ['1, 3, 4', '2, 5, 6', '3, 4, 5', '1, 2, 6'], answer: '1, 3, 4', explanation: 'Respuesta correcta: A) 1, 3, 4 <br> En la evaluación el lector se pregunta si logró los objetivos, si puede explicar el texto y si debería haber releído más.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Lectura connotativa <br> Causa: Un lector ignora el contexto cultural de un texto. <br> Efecto: …', options: ['Mejora su lectura denotativa.', 'Disminuye su capacidad inferencial connotativa.', 'Aumenta su velocidad de lectura.', 'Facilita la identificación de ideas literales.'], answer: 'Disminuye su capacidad inferencial connotativa.', explanation: 'Respuesta correcta: B) Disminuye su capacidad inferencial connotativa. <br> Ignorar el contexto cultural limita la lectura de significados simbólicos e ideológicos.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias <br> Ordene para formar una definición clave: <br> "conexión – información – conocimientos – previos – con – explícita"', options: ['Conexión de información explícita con conocimientos previos', 'Información con conocimientos previos conexión explícita', 'Conocimientos previos con conexión información explícita', 'Explícita conexión con información conocimientos previos'], answer: 'Conexión de información explícita con conocimientos previos', explanation: 'Respuesta correcta: A) Conexión de información explícita con conocimientos previos.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Metacognición <br> Si un estudiante no recuerda lo que leyó después de terminar un texto, ¿qué fase metacognitiva probablemente omitió?', options: ['Planificación', 'Autorregulación', 'Evaluación', 'Inferencia'], answer: 'Evaluación', explanation: 'Respuesta correcta: C) Evaluación <br> Si no recuerda lo leído, probablemente no evaluó ni verificó su comprensión al terminar.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias <br> Indique si los siguientes enunciados son Verdaderos (V) o Falsos (F): <br> 1. Las inferencias son siempre correctas. <br> 2. Las inferencias deductivas van de lo general a lo particular. <br> 3. La práctica mejora la habilidad inferencial. <br> 4. Las inferencias solo se aplican en textos literarios.', options: ['F-V-V-F', 'V-F-F-V', 'V-V-F-F', 'F-F-V-V'], answer: 'F-V-V-F', explanation: 'Respuesta correcta: A) F-V-V-F <br> Falso (pueden ser incorrectas). <br> Verdadero. <br> Verdadero. <br> Falso (se aplican en todo tipo de textos).', multi: 'OFF', maxSelect: 1 },
+            { question: 'Estrategias de comprensión <br> Complete la analogía: <br> Planificación es a antes como evaluación es a ________.', options: ['durante', 'nunca', 'después', 'siempre'], answer: 'después', explanation: 'Respuesta correcta: C) después <br> Planificación = antes / Evaluación = después.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Elementos de la lectura <br> ¿Cuál NO es un elemento de la lectura como proceso interactivo?', options: ['Decodificar signos lingüísticos', 'Interpretar y reflexionar', 'Relacionar con conocimientos previos', 'Memorizar sin comprensión'], answer: 'Memorizar sin comprensión', explanation: 'Respuesta correcta: D) Memorizar sin comprensión <br> La lectura interactiva implica decodificar, interpretar, reflexionar y relacionar con conocimientos previos; memorizar sin comprender no forma parte del proceso.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Lectura connotativa <br> Complete: <br> "La lectura ________ analiza ideologías, estereotipos y valores ________ en el texto."', options: ['denotativa – explícitos', 'connotativa – subyacentes', 'inferencial – literales', 'metacognitiva – objetivos'], answer: 'connotativa – subyacentes', explanation: 'Respuesta correcta: B) connotativa – subyacentes.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Ejemplos de inferencias <br> Relacione cada texto con el tipo de inferencia: <br> Texto <br> 1. “Todos los humanos son mortales. Sócrates es humano.” <br> 2. “Varios países reportan inundaciones.” <br> Tipo de inferencia <br> A) Inductiva <br> B) Deductiva <br> ', options: ['1A - 2B', '1B - 2A', '1A - 2A', '1B - 2B'], answer: '1B - 2A', explanation: 'Respuesta correcta: B) 1b – 2a <br> 1. “Todos los humanos son mortales. Sócrates es humano” &rarr;  deductiva. <br> 2. “Varios países reportan inundaciones” &rarr;  inductiva (se generaliza a partir de casos particulares).', multi: 'OFF', maxSelect: 1 },
+            { question: 'Proceso inferencial <br> Ordene los pasos para hacer una inferencia: <br> 1. Conectar con conocimientos previos <br> 2. Identificar pistas contextuales <br> 3. Formular una conclusión <br> 4. Leer el texto', options: ['4-2-1-3', '2-1-4-3', '4-1-2-3', '1-2-3-4'], answer: '4-2-1-3', explanation: 'Respuesta correcta: A) 4-2-1-3 <br> Leer el texto &rarr;  Identificar pistas contextuales &rarr;  Conectar con conocimientos previos &rarr;  Formular una conclusión.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Metacognición <br> ¿Qué permite la metacognición según el texto?', options: ['Leer más rápido sin comprender.', 'Ser consciente del proceso de lectura y mejorarlo.', 'Evitar la necesidad de releer.', 'Memorizar textos largos fácilmente.'], answer: 'Ser consciente del proceso de lectura y mejorarlo.', explanation: 'Respuesta correcta: B) Ser consciente del proceso de lectura y mejorarlo.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Lectura denotativa y connotativa <br> Texto: “El manual de 1953 decía: ‘La mujer debe obedecer al marido’.” <br> ¿Qué lectura connotativa se puede hacer? <br> ', options: ['Es una instrucción literal.', 'Refleja una ideología patriarcal.', 'Es un ejemplo de lectura denotativa.', 'Promueve la igualdad de género.'], answer: 'Refleja una ideología patriarcal.', explanation: 'Respuesta correcta: B) Refleja una ideología patriarcal. <br> La lectura connotativa interpreta el valor ideológico subyacente.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias <br> ¿En qué tipo de texto son especialmente importantes las inferencias? <br> ', options: ['Solo en textos literarios', 'En textos incompletos o ambiguos', 'Solo en textos científicos', 'En textos muy cortos'], answer: 'En textos incompletos o ambiguos', explanation: 'Respuesta correcta: B) En textos incompletos o ambiguos <br> Son especialmente necesarias cuando el texto no dice todo de forma explícita.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Metacognición <br> Seleccione dos beneficios de la metacognición: <br> 1. Mejora la comprensión profunda <br> 2. Aumenta la velocidad de lectura <br> 3. Desarrolla autonomía lectora <br> 4. Elimina la necesidad de planificación', options: ['1 y 2', '2 y 3', '3 y 4', '1 y 3'], answer: '1 y 3', explanation: 'Respuesta correcta: D) 1 y 3 <br> Mejora la comprensión profunda y desarrolla autonomía lectora.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Estrategias de lectura connotativa <br> Seleccione tres preguntas propias de la lectura connotativa: <br> 1. ¿Qué dice el texto literalmente? <br> 2. ¿Qué ideologías subyacen? <br> 3. ¿Cómo se relaciona con otros discursos? <br> 4. ¿Cuál es la estructura del texto? <br> 5. ¿Qué valores se cuestionan? <br> 6. ¿De qué trata el texto?', options: ['2, 3, 5', '1, 4, 6', '3, 5, 6', '1, 2, 4'], answer: '2, 3, 5', explanation: 'Respuesta correcta: A) 2, 3, 5 <br> Preguntas propias de la lectura connotativa: ideologías subyacentes, relación con otros discursos y valores que se cuestionan.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Metacognición <br> Causa: Un lector practica regularmente la metacognición. <br> Efecto: …', options: ['Se distrae más fácilmente.', 'Mejora su comprensión lectora.', 'Reduce su vocabulario.', 'Limita su capacidad crítica.'], answer: 'Mejora su comprensión lectora.', explanation: 'Respuesta correcta: B) Mejora su comprensión lectora.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Definición de lectura <br> Ordene: "construcción – lectura – es – interactiva – de – significado"', options: ['La lectura es construcción interactiva de significado', 'La lectura interactiva es construcción de significado', 'Construcción interactiva de significado es lectura', 'Significado de construcción interactiva es lectura'], answer: 'La lectura es construcción interactiva de significado', explanation: 'Respuesta correcta: A) La lectura es construcción interactiva de significado.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias <br> Si un texto dice: “Todos los alumnos aprobaron el examen”, ¿qué se puede inferir?', options: ['El examen fue difícil.', 'El profesor fue estricto.', 'Los alumnos estudiaron.', 'No hay información suficiente para inferir por qué aprobaron.'], answer: 'No hay información suficiente para inferir por qué aprobaron.', explanation: 'Respuesta correcta: D) No hay información suficiente para inferir por qué aprobaron. <br> El texto solo informa que aprobaron; no da causas.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Estrategias de comprensión <br> Indique si los siguientes enunciados son Verdaderos (V) o Falsos (F): <br> 1. La lectura denotativa identifica símbolos. <br> 2. La connotativa requiere contexto cultural. <br> 3. Las inferencias son siempre literales. <br> 4. La metacognición se aplica solo en la escuela. <br> ', options: ['F-V-F-F', 'V-F-V-V', 'F-F-V-F', 'V-V-F-F'], answer: 'F-V-F-F', explanation: 'Respuesta correcta: A) F-V-F-F <br> 1. Falso (la denotativa no identifica símbolos). <br> 2. Verdadero. <br> 3. Falso (las inferencias van más allá de lo literal). <br> 4. Falso (la metacognición se aplica en cualquier contexto de aprendizaje).', multi: 'OFF', maxSelect: 1 },
+            { question: 'Tipos de lectura <br> Complete la analogía: <br> Denotativo es a explícito como connotativo es a ________.', options: ['implícito', 'literal', 'objetivo', 'superficial'], answer: 'implícito', explanation: 'Respuesta correcta: A) implícito <br> Denotativo = explícito / Connotativo = implícito.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Fases metacognitivas <br> ¿Cuál NO es una acción de la fase de autorregulación?', options: ['Releer un párrafo', 'Hacer una pausa', 'Establecer objetivos iniciales', 'Buscar palabras en el diccionario'], answer: 'Establecer objetivos iniciales', explanation: 'Respuesta correcta: C) Establecer objetivos iniciales <br> Establecer objetivos es de la fase de planificación, no de autorregulación.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Metacognición <br> Complete: <br> "La ________ es una habilidad que se ________ y se compone de tres fases: ________, autorregulación y evaluación."', options: ['metacognición – entrena – planificación', 'inferencia – ignora – lectura', 'comprensión – mide – organización', 'lectura – practica – inferencia'], answer: 'metacognición – entrena – planificación', explanation: 'Respuesta correcta: A) metacognición – entrena – planificación.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Ejemplos de metacognición <br> Relacione cada acción con la fase metacognitiva correspondiente: <br> Acción <br> 1. Subrayar ideas clave durante la lectura <br> 2. Preguntarse: “¿Logré mis objetivos?” <br> 3. Decidir: “Leeré en un lugar silencioso” <br> Fase <br> A) Planificación <br> B) Autorregulación <br> C) Evaluación', options: ['1B - 2C - 3A', '1A - 2B - 3C', '1C - 2A - 3B', '1B - 2A - 3C'], answer: '1B - 2C - 3A', explanation: 'Respuesta correcta: A) 1b – 2c – 3a <br> 1. Subrayar durante la lectura → Autorregulación. <br> 2. Preguntarse si logró los objetivos → Evaluación. <br> 3. Decidir el lugar de lectura → Planificación.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Proceso de lectura connotativa <br> Ordene los pasos para una lectura connotativa: <br> 1. Identificar valores subyacentes <br> 2. Relacionar con contexto cultural <br> 3. Leer el texto literalmente <br> 4. Interpretar símbolos', options: ['3-4-2-1', '2-1-3-4', '3-2-1-4', '4-3-2-1'], answer: '3-4-2-1', explanation: 'Respuesta correcta: A) 3-4-2-1 <br> Leer literalmente &rarr;  Interpretar símbolos &rarr;  Relacionar con el contexto cultural &rarr;  Identificar valores subyacentes.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias <br> Según el texto, ¿qué se necesita para hacer inferencias correctas?', options: ['Conocimientos previos y contexto', 'Rapidez lectora', 'Conocimiento de gramática avanzada', 'Memorización del texto'], answer: 'Conocimientos previos y contexto', explanation: 'Respuesta correcta: A) Conocimientos previos y contexto.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Metacognición <br> Texto: “Un estudiante, después de leer un artículo, hace un resumen y verifica si entendió las ideas principales.” <br> ¿Qué fase metacognitiva está aplicando?', options: ['Planificación', 'Autorregulación', 'Evaluación', 'Inferencia'], answer: 'Evaluación', explanation: 'Respuesta correcta: C) Evaluación.', multi: 'OFF', maxSelect: 1 },
+        ];
+
+        // EVALUACIÓN (16 preguntas)
+        const quizDataExtra = [
+            { question: 'Metacognición y estrategias de lectura <br> Indica si los siguientes enunciados son Verdaderos (V) o Falsos (F). <br> 1. La metacognición se refiere exclusivamente a la velocidad con la que leemos un texto. <br> 2. La planificación es una fase metacognitiva que se realiza antes de leer. <br> 3. La evaluación metacognitiva ocurre durante la lectura. <br> 4. La autorregulación implica ajustar la estrategia si no se comprende el texto.', options: ['V/V/F/F', 'F/F/V/V', 'F/V/F/V', 'V/F/V/F'], answer: 'F/V/F/V', explanation: '1 es Falso porque la metacognición no se limita a la velocidad, sino al conocimiento y regulación de nuestros procesos de pensamiento. <br> 2 es Verdadero porque la planificación es una fase previa a la lectura. <br> 3 es Falso porque la evaluación se realiza después de la lectura. <br> 4 es Verdadero porque la autorregulación implica monitorear y ajustar la comprensión durante la lectura..', multi: 'OFF', maxSelect: 1 },
+            { question: 'Tipos de lectura <br> Completa la analogía: <br> Lectura denotativa es a objetivo como lectura connotativa es a __________.', options: ['Literal', 'Simbólico', 'Rápida', 'Superficial'], answer: 'Simbólico', explanation: 'La lectura denotativa se centra en el significado literal y objetivo, mientras que la connotativa se enfoca en significados simbólicos, implícitos o culturales..', multi: 'OFF', maxSelect: 1 },
+            { question: 'Elementos de la metacognición <br> Identifica el término que NO pertenece al grupo:', options: ['Planificación', 'Autorregulación', 'Memorización', 'Evaluación'], answer: 'Memorización', explanation: 'La memorización no es una fase de la estrategia metacognitiva descrita en el módulo, que incluye planificación, autorregulación y evaluación.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias <br> Completa el siguiente texto con las palabras adecuadas: <br> “Las __________ son conclusiones que hacemos al conectar la información __________ del texto con nuestros conocimientos __________.”', options: ['inferencias – explícita – previos', 'estrategias – implícita – nuevos', 'metacogniciones – literal – actuales', 'connotaciones – simbólica – futuros'], answer: 'inferencias – explícita – previos', explanation: 'Las inferencias se basan en conectar lo explícito en el texto con los conocimientos previos del lector.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Lectura denotativa vs. connotativa <br> Relaciona cada frase con su tipo de lectura predominante: <br> <img src="https://i.ibb.co/m5fcf1gR/Captura-de-pantalla-2026-09-29-152029.png" alt="Descripción de la imagen" width="550" height="240">.', options: ['1a, 2b, 3b, 4b', '1a, 2a, 3a, 4b', '1a, 2b, 3b, 4a', '1a, 2b, 3a, 4b'], answer: '1a, 2b, 3a, 4b', explanation: 'La lectura denotativa se centra en lo literal; la connotativa, en lo simbólico o sugerido.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Fases de la metacognición <br> Ordena las fases del proceso metacognitivo según su secuencia lógica: <br> 1. Evaluación <br> 2. Planificación <br> 3. Autorregulación', options: ['2 – 3 – 1', '1 – 2 – 3', '3 – 1 – 2', '2 – 1 – 3'], answer: '2 – 3 – 1', explanation: 'El proceso inicia con la planificación (antes de leer), continúa con la autorregulación (durante la lectura) y finaliza con la evaluación (después de leer).', multi: 'OFF', maxSelect: 1 },
+            { question: 'Metacognición <br> Lee el siguiente caso: <br> ‘’María debe leer un artículo sobre inteligencia artificial. Antes de empezar, se pregunta: ‘¿Qué sé yo sobre este tema?’. Durante la lectura, subraya los conceptos clave y busca los que no entiende. Al final, resume las ideas principales.’’ <br> ¿Qué fase metacognitiva NO está explícita en el caso?', options: ['Planificación', 'Autorregulación', 'Evaluación', 'Memorización'], answer: 'Memorización', explanation: 'La memorización no es una fase metacognitiva. María sí realiza planificación (preguntarse qué sabe), autorregulación (subrayar y buscar términos) y evaluación (resumir ideas).', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias <br> Texto: ‘’Carlos llegó a casa con los zapatos mojados y el paraguas goteando. Su hermana le dijo: ‘Parece que afuera está complicado’.’’ <br> ¿Qué inferencia podemos hacer?', options: ['Carlos se cayó a una piscina.', 'Afuera está lloviendo.', 'Carlos olvidó cerrar la llave del agua.', 'Su hermana está enojada.'], answer: 'Afuera está lloviendo.', explanation: 'Los zapatos mojados y el paraguas goteando son pistas contextuales que permiten inferir que está lloviendo..', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias inductivas y deductivas <br> ¿Cuál de los siguientes es un ejemplo de inferencia deductiva?', options: ['Después de ver varios perros ladrar, concluyo que todos los perros ladran.', 'Sabiendo que todos los mamíferos tienen pulmones, concluyo que la ballena tiene pulmones.', 'Observo que varias personas estornudan en un jardín y infiero que hay mucho polen.', 'Veo nubes grises y supongo que va a llover.'], answer: 'Observo que varias personas estornudan en un jardín y infiero que hay mucho polen.', explanation: 'La inferencia deductiva parte de una premisa general (todos los mamíferos tienen pulmones) y la aplica a un caso particular (la ballena)..', multi: 'OFF', maxSelect: 1 },
+            { question: 'Lectura denotativa y connotativa <br> Selecciona DOS opciones que correspondan a una lectura CONNOTATIVA del siguiente enunciado: <br> “Era el atardecer de su vida.” <br> 1. Estaba anocheciendo. <br> 2. Se refería a su vejez. <br> 3. Había nubes rojas en el cielo. <br> 4. Simboliza el final de su existencia.', options: ['1 y 3', '2 y 4', '1 y 2', '3 y 4'], answer: '2 y 4', explanation: 'La lectura connotativa interpreta “atardecer de su vida” como vejez o final de la existencia, no como la descripción literal del atardecer.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Estrategias para hacer inferencias <br> Selecciona TRES estrategias recomendadas para realizar inferencias durante la lectura: <br> 1. Releer el texto 10 veces. <br> 2. Preguntarse qué no se dice, pero se sugiere. <br> 3. Usar pistas contextuales. <br> 4. Conectar con conocimientos previos. <br> 5. Memorizar todas las palabras. <br> 6. Ignorar el contexto cultural. <br> 7. Leer solo textos literarios. <br> 8. Discutir interpretaciones con otras personas.', options: ['2, 3, 4', '1, 5, 7', '3, 6, 8', '4, 7, 8'], answer: '2, 3, 4', explanation: 'Las estrategias válidas para hacer inferencias incluyen preguntarse por lo implícito, usar pistas contextuales y conectar con conocimientos previos.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Dificultades en la comprensión lectora <br> Relaciona la causa con su efecto correspondiente: <br> Causa: <br> 1. Falta de conocimientos previos sobre el contexto. <br> 2. No realizar una lectura connotativa. <br> 3. No autorregular la comprensión durante la lectura. <br> Efecto: <br> a. Interpretación superficial del texto. <br> b. Inferencias equivocadas. <br> c. No detectar que no se está comprendiendo el texto.', options: ['1-a, 2-c, 3-b', '1-c, 2-b, 3-a', '1-b, 2-a, 3-c', '1-b, 2-c, 3-a'], answer: '1-b, 2-a, 3-c', explanation: 'La falta de conocimientos previos puede llevar a inferencias equivocadas (1-B). <BR> No realizar lectura connotativa lleva a una interpretación superficial (2-A). <BR> No autorregular impide detectar fallos en la comprensión (3-C)..', multi: 'OFF', maxSelect: 1 },
+            { question: 'Proceso de lectura metacognitiva <BR> Ordena las siguientes palabras para formar una frase clave del módulo: <BR> ‘’La – metacognición – regula – procesos – nuestros – de – pensamiento’’', options: ['La metacognición regula nuestros procesos de pensamiento.', 'Nuestros procesos de pensamiento regulan la metacognición.', 'La metacognición de procesos regula nuestros pensamientos.', 'Nuestros pensamientos regulan procesos de la metacognición.'], answer: 'La metacognición regula nuestros procesos de pensamiento.', explanation: 'La oración correcta refleja la definición de metacognición como la capacidad de regular nuestros procesos de pensamiento..', multi: 'OFF', maxSelect: 1 },
+            { question: 'Inferencias en publicidad <br> Observa el siguiente eslogan publicitario: <BR> “Con nuestro shampoo, tu cabello lucirá perfecto.” <BR> ¿Qué inferencia inductiva es más probable?', options: ['El shampoo es barato.', 'El shampoo mejora la apariencia del cabello.', 'El shampoo es solo para mujeres.', 'El shampoo contiene químicos dañinos.'], answer: 'El shampoo mejora la apariencia del cabello.', explanation: 'La frase ‘’lucirá perfecto’’ sugiere que el producto mejora la apariencia del cabello, una inferencia inductiva basada en la promesa publicitaria.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Aplicación de metacognición <br> Caso: ‘’Luis lee un texto filosófico complejo. Antes de comenzar, define su objetivo: entender la teoría del autor. Mientras lee, se da cuenta de que no entiende un párrafo, lo relee y busca términos en internet. Al final, escribe un resumen y evalúa si logró su objetivo.’’ <br> ¿Qué fase metacognitiva está ejemplificada cuando Luis relee y busca términos?', options: ['Planificación', 'Evaluación', 'Memorización', 'Autorregulación'], answer: 'Autorregulación', explanation: 'La autorregulación ocurre durante la lectura e implica ajustar la estrategia cuando se detectan problemas de comprensión.', multi: 'OFF', maxSelect: 1 },
+            { question: 'Organizador gráfico de causa-efecto <br> <img 1: src="https://i.ibb.co/TVrFBh2/Captura-de-pantalla-2026-09-30-133409.png" alt="Descripción de la imagen" width="350" height="250"> <br> Texto: “Si un lector no planifica su lectura…” <br> ¿Qué efecto es más probable?', options: ['Comprende mejor el texto.', 'Se distrae con facilidad.', 'Aumenta su velocidad lectora.', 'Recuerda todos los detalles.'], answer: 'Se distrae con facilidad.', explanation: 'La falta de planificación puede llevar a falta de enfoque y distracción, dificultando la comprensión lectora.', multi: 'OFF', maxSelect: 1 },
+        ];
+
+        let state = {
+            currentMode: 'deber',
+            view: 'quiz_home',
+            studentName: '',
+            studentEmail: '',
+            activeQuestions: [],
+            currentQuestion: 0,
+            score: 0,
+            selectedAnswer: null,
+            isAnswerCorrect: null,
+            emailStatus: null,
+            emailAnalysis: null,
+            emailAnalysisMsg: ''
+        };
+
+        const disposableDomains = [
+            'tempmail.com','temp-mail.org','guerrillamail.com','10minutemail.com','mailinator.com',
+            'yopmail.com','throwawaymail.com','fakeinbox.com','trashmail.com','getnada.com',
+            'maildrop.cc','dispostable.com','sharklasers.com','guerrillamailblock.com'
+        ];
+        const trustedProviders = [
+            'gmail.com','googlemail.com','hotmail.com','hotmail.es','hotmail.co.uk','outlook.com',
+            'outlook.es','live.com','msn.com','yahoo.com','yahoo.es','icloud.com','me.com',
+            'protonmail.com','proton.me','aol.com','zoho.com','gmx.com','mail.com'
+        ];
+
+        function isValidEmailFormat(email) {
+            const re = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+            return re.test(email) && email.length <= 254 && !email.includes('..') && !email.startsWith('.') && !email.endsWith('.');
+        }
+
+        function analyzeEmail(email) {
+            const lower = email.toLowerCase().trim();
+            if (!lower) {
+                return { valid: false, msg: 'Escribe un correo electrónico.' };
+            }
+            if (!isValidEmailFormat(lower)) {
+                return { valid: false, msg: 'Formato inválido. Revisa que tenga @ y un dominio correcto.' };
+            }
+            const domain = lower.split('@')[1];
+            if (!domain || domain.length < 3) {
+                return { valid: false, msg: 'Dominio incompleto o inválido.' };
+            }
+            if (disposableDomains.some(d => domain === d || domain.endsWith('.' + d))) {
+                return { valid: false, msg: 'Correo temporal / desechable detectado. Usa un correo real.' };
+            }
+            const isTrusted = trustedProviders.some(p => domain === p);
+            const hasGoodTld = /\.(com|es|net|org|edu|gov|mx|ar|co|uk|de|fr|it|pt|br|cl)$/i.test(domain);
+            if (!hasGoodTld && !isTrusted) {
+                return { valid: false, msg: 'Dominio poco común o sospechoso. Usa Gmail, Hotmail/Outlook, Yahoo, etc.' };
+            }
+            let analysisText = '';
+            if (domain.includes('hotmail') || domain.includes('outlook') || domain.includes('live.com') || domain.includes('msn.com')) {
+                analysisText = 'Análisis: proveedor Microsoft (Hotmail/Outlook) detectado · formato correcto · dominio legítimo';
+            } else if (domain.includes('gmail') || domain.includes('googlemail')) {
+                analysisText = 'Análisis: proveedor Google (Gmail) detectado · formato correcto · dominio legítimo';
+            } else if (isTrusted) {
+                analysisText = 'Análisis: proveedor conocido · formato correcto · dominio legítimo';
+            } else {
+                analysisText = 'Análisis: formato válido · dominio con TLD estándar · no se detectaron patrones de correo temporal';
+            }
+            return { valid: true, msg: analysisText };
+        }
+
+        function showSection(section, btn) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const app = document.getElementById('app');
+            if (section === 'pdf') {
+                app.innerHTML = `<div class="animate-fade-in"><h2 class="text-xl font-bold mb-4">📄 Pizarra Virtual</h2><div class="iframe-container"><iframe src="${DRIVE_PDF_URL}" width="100%" height="100%"></iframe></div></div>`;
+            } else if (section === 'video') {
+                app.innerHTML = `<div class="animate-fade-in"><h2 class="text-xl font-bold mb-4">🎥 Video Clase</h2><div class="iframe-container"><iframe src="${DRIVE_VIDEO_URL}" width="100%" height="100%"></iframe></div></div>`;
+            }
+        }
+
+        function prepQuiz(mode, btn) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            state = {
+                currentMode: mode,
+                view: 'quiz_home',
+                studentName: '',
+                studentEmail: '',
+                activeQuestions: [],
+                currentQuestion: 0,
+                score: 0,
+                selectedAnswer: null,
+                isAnswerCorrect: null,
+                emailStatus: null,
+                emailAnalysis: null,
+                emailAnalysisMsg: ''
+            };
+            render();
+        }
+
+        function startQuiz() {
+            if (state.currentMode === 'deber') {
+                state.activeQuestions = [...quizData];
+            } else if (state.currentMode === 'evaluacion') {
+                state.activeQuestions = [...quizData]
+                    .sort(() => 0.5 - Math.random())
+                    .slice(0, 20);
+            } else if (state.currentMode === 'extra') {
+                state.activeQuestions = [...quizDataExtra];
+            }
+            state.view = 'name_input';
+            state.emailAnalysis = null;
+            state.emailAnalysisMsg = '';
+            render();
+        }
+
+        function onEmailInput() {
+            const e = document.getElementById('email-in');
+            if (!e) return;
+            const val = e.value.trim();
+            if (val.length < 5) {
+                state.emailAnalysis = null;
+                state.emailAnalysisMsg = '';
+                updateEmailUI();
+                return;
+            }
+            state.emailAnalysis = 'checking';
+            state.emailAnalysisMsg = 'Analizando correo…';
+            updateEmailUI();
+            clearTimeout(window._emailCheckTimer);
+            window._emailCheckTimer = setTimeout(() => {
+                const result = analyzeEmail(val);
+                state.emailAnalysis = result.valid ? 'valid' : 'invalid';
+                state.emailAnalysisMsg = result.msg;
+                updateEmailUI();
+            }, 600);
+        }
+
+        function updateEmailUI() {
+            const feedback = document.getElementById('email-feedback');
+            const analysis = document.getElementById('email-analysis');
+            const input = document.getElementById('email-in');
+            if (!feedback || !analysis || !input) return;
+            if (state.emailAnalysis === 'checking') {
+                feedback.innerHTML = `<span class="text-slate-500 text-sm flex items-center gap-2"><span class="dot-pulse">●</span> Verificando…</span>`;
+                analysis.innerHTML = `<p class="text-xs text-slate-400 mt-1">${state.emailAnalysisMsg}</p>`;
+                input.classList.remove('border-red-400', 'border-emerald-400');
+                input.classList.add('border-slate-300');
+            } else if (state.emailAnalysis === 'invalid') {
+                feedback.innerHTML = `<span class="text-red-600 text-sm font-semibold">✗ Correo no válido o inexistente</span>`;
+                analysis.innerHTML = `<p class="text-xs text-red-500/80 mt-1">${state.emailAnalysisMsg}</p>`;
+                input.classList.remove('border-emerald-400', 'border-slate-300');
+                input.classList.add('border-red-400');
+            } else if (state.emailAnalysis === 'valid') {
+                feedback.innerHTML = `<span class="text-emerald-600 text-sm font-semibold">✓ Correo aceptado</span>`;
+                analysis.innerHTML = `<p class="text-xs text-emerald-600/80 mt-1">${state.emailAnalysisMsg}</p>`;
+                input.classList.remove('border-red-400', 'border-slate-300');
+                input.classList.add('border-emerald-400');
+            } else {
+                feedback.innerHTML = '';
+                analysis.innerHTML = '';
+                input.classList.remove('border-red-400', 'border-emerald-400');
+                input.classList.add('border-slate-300');
+            }
+        }
+
+        function validaDatos() {
+            const n = document.getElementById('name-in').value.trim();
+            const e = document.getElementById('email-in').value.trim();
+            if (n.length <= 2) {
+                alert("Ingresa nombre completo (mínimo 3 caracteres).");
+                return;
+            }
+            const result = analyzeEmail(e);
+            state.emailAnalysis = result.valid ? 'valid' : 'invalid';
+            state.emailAnalysisMsg = result.msg;
+            updateEmailUI();
+            if (!result.valid) return;
+            state.studentName = n;
+            state.studentEmail = e;
+            state.view = 'playing';
+            render();
+        }
+
+        // ---------- LÓGICA DE RESPUESTAS (single + multi) ----------
+        function isMultiQuestion(q) {
+            return q.multi === 'ON';
+        }
+
+        function arraysEqual(a, b) {
+            if (!Array.isArray(a) || !Array.isArray(b)) return false;
+            if (a.length !== b.length) return false;
+            const sa = [...a].sort();
+            const sb = [...b].sort();
+            return sa.every((v, i) => v === sb[i]);
+        }
+
+        function handleAnswer(option) {
+            // Ya se comprobó la respuesta → no permitir más cambios
+            if (state.isAnswerCorrect !== null) return;
+
+            const currentQ = state.activeQuestions[state.currentQuestion];
+
+            if (isMultiQuestion(currentQ)) {
+                // Selección múltiple: toggle
+                let selected = Array.isArray(state.selectedAnswer) ? [...state.selectedAnswer] : [];
+                const idx = selected.indexOf(option);
+
+                if (idx > -1) {
+                    selected.splice(idx, 1); // deseleccionar
+                } else {
+                    if (selected.length >= currentQ.maxSelect) return; // límite alcanzado
+                    selected.push(option);
+                }
+                state.selectedAnswer = selected;
+                render();
+            } else {
+                // Selección simple (incluye preguntas V/F)
+                if (state.selectedAnswer !== null) return;
+                state.selectedAnswer = option;
+                state.isAnswerCorrect = (option === currentQ.answer);
+                if (state.isAnswerCorrect) state.score++;
+                render();
+                if (state.isAnswerCorrect) {
+                    setTimeout(() => nextQuestion(), 1000);
+                }
+            }
+        }
+
+        function checkMultiAnswer() {
+            if (state.isAnswerCorrect !== null) return;
+
+            const currentQ = state.activeQuestions[state.currentQuestion];
+            if (!isMultiQuestion(currentQ)) return;
+
+            const selected = Array.isArray(state.selectedAnswer) ? state.selectedAnswer : [];
+            if (selected.length === 0) return;
+
+            // Comparación exacta (mismo conjunto de respuestas)
+            const correctAnswers = Array.isArray(currentQ.answer) ? currentQ.answer : [currentQ.answer];
+            state.isAnswerCorrect = arraysEqual(selected, correctAnswers);
+
+            if (state.isAnswerCorrect) state.score++;
+            render();
+
+            if (state.isAnswerCorrect) {
+                setTimeout(() => nextQuestion(), 1000);
+            }
+        }
+
+        function nextQuestion() {
+            if (state.currentQuestion + 1 < state.activeQuestions.length) {
+                state.currentQuestion++;
+                state.selectedAnswer = null;
+                state.isAnswerCorrect = null;
+                render();
+            } else {
+                state.view = 'results';
+                render();
+                enviarCorreo();
+            }
+        }
+
+        function enviarCorreo() {
+            if (!state.studentEmail) return;
+            state.emailStatus = 'sending';
+            render();
+            const scorePerc = Math.round((state.score / state.activeQuestions.length) * 100);
+            const totalQ = state.activeQuestions.length;
+            let imageUrl = '';
+            let mensaje = '';
+            if (scorePerc >= 90) {
+                imageUrl = 'https://img.icons8.com/color/128/medal2.png';
+                mensaje = `¡Excelente trabajo, ${state.studentName}! Obtuviste un resultado sobresaliente.`;
+            } else if (scorePerc >= 70) {
+                imageUrl = 'https://img.icons8.com/color/128/diploma.png';
+                mensaje = `¡Muy bien, ${state.studentName}! Has aprobado con un buen resultado.`;
+            } else if (scorePerc >= 50) {
+                imageUrl = 'https://img.icons8.com/color/128/ok.png';
+                mensaje = `Buen esfuerzo, ${state.studentName}. Sigue practicando para mejorar.`;
+            } else {
+                imageUrl = 'https://img.icons8.com/color/128/error.png';
+                mensaje = `Ánimo, ${state.studentName}. Revisa el material y vuelve a intentarlo.`;
+            }
+            const params = {
+                to_name: state.studentName,
+                to_email: state.studentEmail,
+                score: scorePerc,
+                correct_answers: state.score,
+                total_questions: totalQ,
+                mode_name: state.currentMode.toUpperCase(),
+                image_url: imageUrl,
+                mensaje: mensaje,
+                fecha: new Date().toLocaleDateString('es-ES', { 
+                    year: 'numeric', month: 'long', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                })
+            };
+            emailjs.send("service_dhvsi72", "template_cy74x9h", params)
+                .then(() => { 
+                    state.emailStatus = 'success'; 
+                    render(); 
+                })
+                .catch((err) => { 
+                    console.error('Error EmailJS:', err);
+                    state.emailStatus = 'error'; 
+                    render(); 
+                });
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+            
+            let modeTitle = '';
+            let modeDesc = '';
+            if (state.currentMode === 'deber') {
+                modeTitle = '📚 Practica';
+                modeDesc = 'Resuelve las 50 preguntas del banco en orden.';
+            } else if (state.currentMode === 'evaluacion') {
+                modeTitle = '📝 Repaso';
+                modeDesc = 'Prueba de 20 preguntas seleccionadas al azar.';
+            } else if (state.currentMode === 'extra') {
+                modeTitle = '📊 Evaluación';
+                modeDesc = 'Resuelve las 16 preguntas de la Evaluación.';
+            }
+            
+            if (state.view === 'quiz_home') {
+                app.innerHTML = `
+                <div class="text-center py-16 animate-fade-in bg-white rounded-[3rem] shadow-xl border">
+                    <h2 class="text-4xl font-black text-slate-800 mb-2">${modeTitle}</h2>
+                    <p class="text-slate-500 mb-8 text-lg">${modeDesc}</p>
+                    <button onclick="startQuiz()" class="bg-emerald-600 text-white px-12 py-5 rounded-2xl font-black text-xl hover:bg-emerald-700 transition-all">
+                        INICIAR
+                    </button>
+                </div>`;
+            }
+
+            if (state.view === 'name_input') {
+                app.innerHTML = `
+                <div class="max-w-md mx-auto bg-white p-10 rounded-[2.5rem] shadow-2xl animate-fade-in">
+                    <h2 class="text-2xl font-black mb-6 text-center">Registro de Estudiante</h2>
+                    <input id="name-in" type="text" placeholder="Nombre y Apellido completo" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl mb-4 focus:border-emerald-500 outline-none">
+                    
+                    <div class="relative mb-1">
+                        <input id="email-in" type="email" placeholder="Correo para recibir nota (Gmail, Hotmail…)" 
+                               class="w-full p-4 bg-slate-50 border border-slate-300 rounded-xl focus:border-emerald-500 outline-none transition-colors"
+                               oninput="onEmailInput()" onblur="onEmailInput()">
+                    </div>
+                    
+                    <div id="email-feedback" class="min-h-[22px] mb-1"></div>
+                    <div id="email-analysis" class="mb-5"></div>
+                    
+                    <button onclick="validaDatos()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all">
+                        ENTRAR AL TEST
+                    </button>
+                    <p class="text-center text-[11px] text-slate-400 mt-4">Se verifica formato y se descartan correos temporales. No se envía nada hasta terminar el test.</p>
+                </div>`;
+                setTimeout(updateEmailUI, 50);
+            }
+
+            if (state.view === 'playing') {
+                const q = state.activeQuestions[state.currentQuestion];
+                const progress = ((state.currentQuestion + 1) / state.activeQuestions.length) * 100;
+                const multi = isMultiQuestion(q);
+                const selected = multi
+                    ? (Array.isArray(state.selectedAnswer) ? state.selectedAnswer : [])
+                    : (state.selectedAnswer ? [state.selectedAnswer] : []);
+
+                // Indicador de selección múltiple (CORREGIDO)
+                const multiHint = multi
+                    ? `<p class="text-sm text-sky-600 font-semibold mb-4">
+                         Selección múltiple · elige q.maxSelectrespuesta{q.maxSelect > 1 ? 's' : ''}
+                         ${selected.length > 0 ? `(${selected.length}/${q.maxSelect})` : ''}
+                       </p>`
+                    : '';
+
+                app.innerHTML = `
+                <div class="animate-fade-in">
+                    <div class="flex justify-between items-center mb-6 px-4">
+                        <span class="font-black text-emerald-600">${state.currentQuestion + 1} / ${state.activeQuestions.length}</span>
+                        <div class="w-48 bg-slate-200 h-2 rounded-full overflow-hidden">
+                            <div class="bg-emerald-500 h-full transition-all" style="width:${progress}%"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl border">
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2 leading-tight">${q.question}</h2>
+                        ${multiHint}
+                        <div class="grid gap-3">
+                            ${q.options.map(opt => {
+                                let style = "border-slate-100 bg-slate-50 hover:border-emerald-200";
+                                const isSelected = selected.includes(opt);
+
+                                if (state.isAnswerCorrect !== null) {
+                                    // Ya se comprobó → mostrar feedback final
+                                    if (multi) {
+                                        const correctSet = Array.isArray(q.answer) ? q.answer : [q.answer];
+                                        if (correctSet.includes(opt) && isSelected) {
+                                            style = "border-emerald-500 bg-emerald-100 text-emerald-800";
+                                        } else if (isSelected && !correctSet.includes(opt)) {
+                                            style = "border-red-500 bg-red-100 text-red-800";
+                                        } else if (correctSet.includes(opt) && !isSelected) {
+                                            style = "border-emerald-300 bg-emerald-50 text-emerald-700";
+                                        }
+                                    } else {
+                                        // Selección simple (incluye V/F)
+                                        if (opt === q.answer) {
+                                            // Siempre mostrar la correcta en verde
+                                            style = "border-emerald-500 bg-emerald-100 text-emerald-800";
+                                        } else if (isSelected) {
+                                            style = "border-red-500 bg-red-100 text-red-800";
+                                        }
+                                    }
+                                } else if (isSelected) {
+                                    // Selección en curso
+                                    if (multi) {
+                                        style = "border-sky-400 bg-sky-100 text-sky-800";
+                                    } else {
+                                        style = "border-emerald-500 bg-emerald-100 text-emerald-800";
+                                    }
+                                }
+
+                                // Escapar comillas para el atributo onclick (más seguro)
+                                const safeOpt = opt.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+
+                                return `<button onclick="handleAnswer('${safeOpt}')" 
+                                            class="p-5 text-left border-2 rounded-xl font-bold transition-all ${style}">
+                                            ${opt}
+                                        </button>`;
+                            }).join('')}
+                        </div>
+
+                        ${/* Botón comprobar (solo multi y aún no comprobado) - CORREGIDO */
+                          multi && state.isAnswerCorrect === null ? `
+                            <button onclick="checkMultiAnswer()" 
+                                class="mt-6 w-full py-4 rounded-xl font-bold transition-all
+                                ${selected.length === q.maxSelect 
+                                    ? 'bg-sky-600 text-white hover:bg-sky-700' 
+                                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'}"
+                                ${selected.length !== q.maxSelect ? 'disabled' : ''}>
+                                Comprobar respuesta (selected.length/{q.maxSelect})
+                            </button>
+                          ` : ''}
+
+                        ${/* Explicación + siguiente (cuando falló) */
+                          state.selectedAnswer !== null && state.isAnswerCorrect === false ? `
+                            <div class="mt-6 p-5 bg-amber-50 border border-amber-200 rounded-xl">
+                                <p class="font-bold text-amber-800 mb-2">Explicación:</p>
+                                <p class="text-slate-700">${q.explanation}</p>
+                            </div>
+                            <button onclick="nextQuestion()" class="mt-6 w-full bg-emerald-600 text-white py-4 rounded-xl font-bold hover:bg-emerald-700 transition-all">
+                                Siguiente pregunta
+                            </button>
+                          ` : ''}
+                    </div>
+                </div>`;
+            }
+
+            if (state.view === 'results') {
+                const scorePerc = Math.round((state.score / state.activeQuestions.length) * 100);
+                app.innerHTML = `
+                <div class="max-w-md mx-auto text-center animate-fade-in bg-white p-12 rounded-[3rem] shadow-2xl">
+                    <h2 class="text-2xl font-black mb-2">${state.studentName}</h2>
+                    <p class="text-slate-400 uppercase text-xs font-bold mb-6">${state.currentMode}</p>
+                    <div class="text-7xl font-black text-emerald-600 mb-4">${scorePerc}%</div>
+                    <p class="text-lg font-bold text-slate-700 mb-10">${state.score} / ${state.activeQuestions.length} correctas</p>
+                    <button onclick="location.reload()" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold">VOLVER AL INICIO</button> 
+                    <p class="mt-6 text-xs font-bold text-slate-400"> 
+                        ${state.emailStatus === 'success' ? '✅ Nota e imagen enviadas al correo' : 
+                          state.emailStatus === 'error' ? '⚠️ Error al enviar nota e imagen' : 
+                          '⏳ Enviando nota e imagen al correo...'}
+                    </p>
+                </div>`;
+            }
+        }
+        render();
+    </script>
+</body>
+</html>
+
