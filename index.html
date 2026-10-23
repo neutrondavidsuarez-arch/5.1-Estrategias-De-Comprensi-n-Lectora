@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioLearning - Tema 1</title>
+    <title>BioLearning - Tema 5.1 Estrategias de comprensión lectora</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -20,6 +20,7 @@
         .nav-btn.active { border-color: #10b981; color: #10b981; }
         @keyframes pulse-dot { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
         .dot-pulse { animation: pulse-dot 1.2s infinite; }
+        .question-img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 0.5rem 0; }
     </style>
 </head>
 <body class="bg-slate-50 font-sans min-h-screen">
@@ -51,13 +52,12 @@
             </div>
         </div>
     </header>
-    <main id="app" class="max-w-5xl mx-auto p-6">
-    </main>
+    <main id="app" class="max-w-5xl mx-auto p-6"></main>
     <script>
         const DRIVE_PDF_URL = "https://drive.google.com/file/d/1oKFhVhjsDaVlPU7_QdpHiYMIZW7o-EA5/view?usp=sharing";
         const DRIVE_VIDEO_URL = "https://drive.google.com/file/d/1kXTvamFJiq9f4YfCKyfidlinw5pK9VUS/view?usp=sharing";
 
-        // PRINCIPAL (Práctica + Repaso)
+        // PRINCIPAL (Deber + Repaso) – 50 preguntas
         const quizData = [
            { question: 'Metacognición <br> Indique si los siguientes enunciados son Verdaderos (V) o Falsos (F) según el texto. <br> 1. La metacognición se refiere únicamente a la velocidad de lectura. <br> 2. La planificación es una fase metacognitiva que se realiza antes de leer. <br> 3. La evaluación metacognitiva ocurre durante la lectura. <br> 4. La metacognición es una habilidad innata que no puede entrenarse.', options: ['V-V-V-V', 'F-V-F-F', 'V-F-V-F', 'F-V-F-V'], answer: 'F-V-F-F', explanation: 'Respuesta correcta: B) F-V-F-F <br> A) Falso: la metacognición no se limita a la velocidad de lectura; es la conciencia y regulación de los propios procesos cognitivos. <br> B) Verdadero: la planificación es la fase previa a la lectura. <br> C) Falso: la evaluación ocurre después de leer; durante la lectura se realiza la autorregulación. <br> D) Falso: la metacognición se puede entrenar y mejorar..', multi: 'OFF', maxSelect: 1 },
             { question: 'Lectura denotativa y connotativa <br> Complete la analogía: <br> Denotativo es a literal como connotativo es a ________.', options: ['Objetivo', 'Simbólico', 'Explícito', 'Directo'], answer: 'Simbólico', explanation: 'Respuesta correcta: B) Simbólico <br> Denotativo = literal / Connotativo = simbólico (o figurado).', multi: 'OFF', maxSelect: 1 },
@@ -111,7 +111,7 @@
             { question: 'Metacognición <br> Texto: “Un estudiante, después de leer un artículo, hace un resumen y verifica si entendió las ideas principales.” <br> ¿Qué fase metacognitiva está aplicando?', options: ['Planificación', 'Autorregulación', 'Evaluación', 'Inferencia'], answer: 'Evaluación', explanation: 'Respuesta correcta: C) Evaluación.', multi: 'OFF', maxSelect: 1 },
         ];
 
-        // EVALUACIÓN (16 preguntas)
+        // Evaluación – 16 preguntas
         const quizDataExtra = [
             { question: 'Metacognición y estrategias de lectura <br> Indica si los siguientes enunciados son Verdaderos (V) o Falsos (F). <br> 1. La metacognición se refiere exclusivamente a la velocidad con la que leemos un texto. <br> 2. La planificación es una fase metacognitiva que se realiza antes de leer. <br> 3. La evaluación metacognitiva ocurre durante la lectura. <br> 4. La autorregulación implica ajustar la estrategia si no se comprende el texto.', options: ['V/V/F/F', 'F/F/V/V', 'F/V/F/V', 'V/F/V/F'], answer: 'F/V/F/V', explanation: '1 es Falso porque la metacognición no se limita a la velocidad, sino al conocimiento y regulación de nuestros procesos de pensamiento. <br> 2 es Verdadero porque la planificación es una fase previa a la lectura. <br> 3 es Falso porque la evaluación se realiza después de la lectura. <br> 4 es Verdadero porque la autorregulación implica monitorear y ajustar la comprensión durante la lectura..', multi: 'OFF', maxSelect: 1 },
             { question: 'Tipos de lectura <br> Completa la analogía: <br> Lectura denotativa es a objetivo como lectura connotativa es a __________.', options: ['Literal', 'Simbólico', 'Rápida', 'Superficial'], answer: 'Simbólico', explanation: 'La lectura denotativa se centra en el significado literal y objetivo, mientras que la connotativa se enfoca en significados simbólicos, implícitos o culturales..', multi: 'OFF', maxSelect: 1 },
@@ -131,6 +131,18 @@
             { question: 'Organizador gráfico de causa-efecto <br> <img 1: src="https://i.ibb.co/TVrFBh2/Captura-de-pantalla-2026-09-30-133409.png" alt="Descripción de la imagen" width="350" height="250"> <br> Texto: “Si un lector no planifica su lectura…” <br> ¿Qué efecto es más probable?', options: ['Comprende mejor el texto.', 'Se distrae con facilidad.', 'Aumenta su velocidad lectora.', 'Recuerda todos los detalles.'], answer: 'Se distrae con facilidad.', explanation: 'La falta de planificación puede llevar a falta de enfoque y distracción, dificultando la comprensión lectora.', multi: 'OFF', maxSelect: 1 },
         ];
 
+        // ========== CONFIGURACIÓN DEL TEMPORIZADOR DE EVALUACIÓN ==========
+        // Tiempo total: 16 minutos = 960 segundos (igual que Tema 1)
+        const EVAL_TIMER_SECONDS = 960;
+
+        // Tres fases de color según el tiempo RESTANTE (en segundos).
+        const EVAL_TIMER_PHASES = [
+            { minSeconds: 480, colorClass: 'text-emerald-600 bg-emerald-50 border-emerald-300' }, // ≥ 8 min → verde
+            { minSeconds: 60,  colorClass: 'text-amber-600 bg-amber-50 border-amber-300' },     // ≥ 1 min  → ámbar
+            { minSeconds: 0,   colorClass: 'text-red-600 bg-red-50 border-red-300' }            // < 1 min  → rojo
+        ];
+        // ==================================================================
+
         let state = {
             currentMode: 'deber',
             view: 'quiz_home',
@@ -143,8 +155,11 @@
             isAnswerCorrect: null,
             emailStatus: null,
             emailAnalysis: null,
-            emailAnalysisMsg: ''
+            emailAnalysisMsg: '',
+            timeLeft: 0
         };
+
+        let timerInterval = null;
 
         const disposableDomains = [
             'tempmail.com','temp-mail.org','guerrillamail.com','10minutemail.com','mailinator.com',
@@ -164,16 +179,10 @@
 
         function analyzeEmail(email) {
             const lower = email.toLowerCase().trim();
-            if (!lower) {
-                return { valid: false, msg: 'Escribe un correo electrónico.' };
-            }
-            if (!isValidEmailFormat(lower)) {
-                return { valid: false, msg: 'Formato inválido. Revisa que tenga @ y un dominio correcto.' };
-            }
+            if (!lower) return { valid: false, msg: 'Escribe un correo electrónico.' };
+            if (!isValidEmailFormat(lower)) return { valid: false, msg: 'Formato inválido. Revisa que tenga @ y un dominio correcto.' };
             const domain = lower.split('@')[1];
-            if (!domain || domain.length < 3) {
-                return { valid: false, msg: 'Dominio incompleto o inválido.' };
-            }
+            if (!domain || domain.length < 3) return { valid: false, msg: 'Dominio incompleto o inválido.' };
             if (disposableDomains.some(d => domain === d || domain.endsWith('.' + d))) {
                 return { valid: false, msg: 'Correo temporal / desechable detectado. Usa un correo real.' };
             }
@@ -198,18 +207,19 @@
         function showSection(section, btn) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            stopTimer();
             const app = document.getElementById('app');
             if (section === 'pdf') {
-                app.innerHTML = `<div class="animate-fade-in"><h2 class="text-xl font-bold mb-4">📄 Pizarra Virtual</h2><div class="iframe-container"><iframe src="${DRIVE_PDF_URL}" width="100%" height="100%"></iframe></div></div>`;
+                app.innerHTML = `<div class="animate-fade-in"><h2 class="text-xl font-bold mb-4">📄 Pizarra Virtual</h2><div class="iframe-container"><iframe src="${DRIVE_PDF_URL}" width="100%" height="100%" allow="autoplay"></iframe></div></div>`;
             } else if (section === 'video') {
-                app.innerHTML = `<div class="animate-fade-in"><h2 class="text-xl font-bold mb-4">🎥 Video Clase</h2><div class="iframe-container"><iframe src="${DRIVE_VIDEO_URL}" width="100%" height="100%"></iframe></div></div>`;
+                app.innerHTML = `<div class="animate-fade-in"><h2 class="text-xl font-bold mb-4">🎥 Video Clase</h2><div class="iframe-container"><iframe src="${DRIVE_VIDEO_URL}" width="100%" height="100%" allow="autoplay"></iframe></div></div>`;
             }
         }
 
         function prepQuiz(mode, btn) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            
+            stopTimer();
             state = {
                 currentMode: mode,
                 view: 'quiz_home',
@@ -222,19 +232,23 @@
                 isAnswerCorrect: null,
                 emailStatus: null,
                 emailAnalysis: null,
-                emailAnalysisMsg: ''
+                emailAnalysisMsg: '',
+                timeLeft: 0
             };
             render();
         }
 
         function startQuiz() {
             if (state.currentMode === 'deber') {
+                // Deber: 50 preguntas en orden
                 state.activeQuestions = [...quizData];
             } else if (state.currentMode === 'evaluacion') {
+                // Repaso: 20 preguntas aleatorias
                 state.activeQuestions = [...quizData]
                     .sort(() => 0.5 - Math.random())
                     .slice(0, 20);
             } else if (state.currentMode === 'extra') {
+                // Evaluación: 16 preguntas en orden
                 state.activeQuestions = [...quizDataExtra];
             }
             state.view = 'name_input';
@@ -308,10 +322,57 @@
             state.studentName = n;
             state.studentEmail = e;
             state.view = 'playing';
+            if (state.currentMode === 'extra') {
+                startTimer();
+            }
             render();
         }
 
-        // ---------- LÓGICA DE RESPUESTAS (single + multi) ----------
+        // ---------- TEMPORIZADOR (solo Evaluación / extra) ----------
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function getTimerPhaseClass(remaining) {
+            for (const phase of EVAL_TIMER_PHASES) {
+                if (remaining >= phase.minSeconds) {
+                    return phase.colorClass;
+                }
+            }
+            return EVAL_TIMER_PHASES[EVAL_TIMER_PHASES.length - 1].colorClass;
+        }
+
+        function startTimer() {
+            stopTimer();
+            state.timeLeft = EVAL_TIMER_SECONDS;
+            timerInterval = setInterval(() => {
+                state.timeLeft--;
+                if (state.timeLeft <= 0) {
+                    state.timeLeft = 0;
+                    stopTimer();
+                    state.view = 'results';
+                    render();
+                    enviarCorreo();
+                    return;
+                }
+                const timerEl = document.getElementById('eval-timer');
+                if (timerEl) {
+                    timerEl.textContent = formatTime(state.timeLeft);
+                    timerEl.className = `px-3 py-1.5 rounded-xl border-2 font-black text-sm tabular-nums ${getTimerPhaseClass(state.timeLeft)}`;
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        // ---------- LÓGICA SINGLE + MULTI ----------
         function isMultiQuestion(q) {
             return q.multi === 'ON';
         }
@@ -324,27 +385,23 @@
             return sa.every((v, i) => v === sb[i]);
         }
 
-        function handleAnswer(option) {
-            // Ya se comprobó la respuesta → no permitir más cambios
+        function handleAnswer(idx) {
             if (state.isAnswerCorrect !== null) return;
-
             const currentQ = state.activeQuestions[state.currentQuestion];
+            const option = currentQ.options[idx];
 
             if (isMultiQuestion(currentQ)) {
-                // Selección múltiple: toggle
                 let selected = Array.isArray(state.selectedAnswer) ? [...state.selectedAnswer] : [];
-                const idx = selected.indexOf(option);
-
-                if (idx > -1) {
-                    selected.splice(idx, 1); // deseleccionar
+                const pos = selected.indexOf(option);
+                if (pos > -1) {
+                    selected.splice(pos, 1);
                 } else {
-                    if (selected.length >= currentQ.maxSelect) return; // límite alcanzado
+                    if (selected.length >= currentQ.maxSelect) return;
                     selected.push(option);
                 }
                 state.selectedAnswer = selected;
                 render();
             } else {
-                // Selección simple (incluye preguntas V/F)
                 if (state.selectedAnswer !== null) return;
                 state.selectedAnswer = option;
                 state.isAnswerCorrect = (option === currentQ.answer);
@@ -358,20 +415,14 @@
 
         function checkMultiAnswer() {
             if (state.isAnswerCorrect !== null) return;
-
             const currentQ = state.activeQuestions[state.currentQuestion];
             if (!isMultiQuestion(currentQ)) return;
-
             const selected = Array.isArray(state.selectedAnswer) ? state.selectedAnswer : [];
             if (selected.length === 0) return;
-
-            // Comparación exacta (mismo conjunto de respuestas)
             const correctAnswers = Array.isArray(currentQ.answer) ? currentQ.answer : [currentQ.answer];
             state.isAnswerCorrect = arraysEqual(selected, correctAnswers);
-
             if (state.isAnswerCorrect) state.score++;
             render();
-
             if (state.isAnswerCorrect) {
                 setTimeout(() => nextQuestion(), 1000);
             }
@@ -384,6 +435,7 @@
                 state.isAnswerCorrect = null;
                 render();
             } else {
+                stopTimer();
                 state.view = 'results';
                 render();
                 enviarCorreo();
@@ -420,20 +472,20 @@
                 mode_name: state.currentMode.toUpperCase(),
                 image_url: imageUrl,
                 mensaje: mensaje,
-                fecha: new Date().toLocaleDateString('es-ES', { 
+                fecha: new Date().toLocaleDateString('es-ES', {
                     year: 'numeric', month: 'long', day: 'numeric',
                     hour: '2-digit', minute: '2-digit'
                 })
             };
             emailjs.send("service_dhvsi72", "template_cy74x9h", params)
-                .then(() => { 
-                    state.emailStatus = 'success'; 
-                    render(); 
+                .then(() => {
+                    state.emailStatus = 'success';
+                    render();
                 })
-                .catch((err) => { 
+                .catch((err) => {
                     console.error('Error EmailJS:', err);
-                    state.emailStatus = 'error'; 
-                    render(); 
+                    state.emailStatus = 'error';
+                    render();
                 });
         }
 
@@ -450,7 +502,7 @@
                 modeDesc = 'Prueba de 20 preguntas seleccionadas al azar.';
             } else if (state.currentMode === 'extra') {
                 modeTitle = '📊 Evaluación';
-                modeDesc = 'Resuelve las 16 preguntas de la Evaluación.';
+                modeDesc = 'Resuelve las 16 preguntas de la Evaluación (tiempo límite: 16 min).';
             }
             
             if (state.view === 'quiz_home') {
@@ -495,32 +547,38 @@
                     ? (Array.isArray(state.selectedAnswer) ? state.selectedAnswer : [])
                     : (state.selectedAnswer ? [state.selectedAnswer] : []);
 
-                // Indicador de selección múltiple (CORREGIDO)
                 const multiHint = multi
                     ? `<p class="text-sm text-sky-600 font-semibold mb-4">
-                         Selección múltiple · elige q.maxSelectrespuesta{q.maxSelect > 1 ? 's' : ''}
+                         Selección múltiple · elige ${q.maxSelect} respuesta${q.maxSelect > 1 ? 's' : ''}
                          ${selected.length > 0 ? `(${selected.length}/${q.maxSelect})` : ''}
                        </p>`
                     : '';
 
+                // Timer solo en Evaluación (extra)
+                const timerHtml = (state.currentMode === 'extra')
+                    ? `<div id="eval-timer" class="px-3 py-1.5 rounded-xl border-2 font-black text-sm tabular-nums ${getTimerPhaseClass(state.timeLeft)}">
+                           ${formatTime(state.timeLeft)}
+                       </div>`
+                    : '';
+
                 app.innerHTML = `
                 <div class="animate-fade-in">
-                    <div class="flex justify-between items-center mb-6 px-4">
+                    <div class="flex justify-between items-center mb-6 px-4 gap-4">
                         <span class="font-black text-emerald-600">${state.currentQuestion + 1} / ${state.activeQuestions.length}</span>
-                        <div class="w-48 bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div class="flex-1 max-w-xs bg-slate-200 h-2 rounded-full overflow-hidden">
                             <div class="bg-emerald-500 h-full transition-all" style="width:${progress}%"></div>
                         </div>
+                        ${timerHtml}
                     </div>
                     <div class="bg-white p-8 md:p-12 rounded-[2.5rem] shadow-xl border">
                         <h2 class="text-2xl font-bold text-slate-800 mb-2 leading-tight">${q.question}</h2>
                         ${multiHint}
                         <div class="grid gap-3">
-                            ${q.options.map(opt => {
+                            ${q.options.map((opt, idx) => {
                                 let style = "border-slate-100 bg-slate-50 hover:border-emerald-200";
                                 const isSelected = selected.includes(opt);
 
                                 if (state.isAnswerCorrect !== null) {
-                                    // Ya se comprobó → mostrar feedback final
                                     if (multi) {
                                         const correctSet = Array.isArray(q.answer) ? q.answer : [q.answer];
                                         if (correctSet.includes(opt) && isSelected) {
@@ -531,16 +589,13 @@
                                             style = "border-emerald-300 bg-emerald-50 text-emerald-700";
                                         }
                                     } else {
-                                        // Selección simple (incluye V/F)
                                         if (opt === q.answer) {
-                                            // Siempre mostrar la correcta en verde
                                             style = "border-emerald-500 bg-emerald-100 text-emerald-800";
                                         } else if (isSelected) {
                                             style = "border-red-500 bg-red-100 text-red-800";
                                         }
                                     }
                                 } else if (isSelected) {
-                                    // Selección en curso
                                     if (multi) {
                                         style = "border-sky-400 bg-sky-100 text-sky-800";
                                     } else {
@@ -548,30 +603,25 @@
                                     }
                                 }
 
-                                // Escapar comillas para el atributo onclick (más seguro)
-                                const safeOpt = opt.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-
-                                return `<button onclick="handleAnswer('${safeOpt}')" 
+                                return `<button onclick="handleAnswer(${idx})" 
                                             class="p-5 text-left border-2 rounded-xl font-bold transition-all ${style}">
                                             ${opt}
                                         </button>`;
                             }).join('')}
                         </div>
 
-                        ${/* Botón comprobar (solo multi y aún no comprobado) - CORREGIDO */
-                          multi && state.isAnswerCorrect === null ? `
+                        ${multi && state.isAnswerCorrect === null ? `
                             <button onclick="checkMultiAnswer()" 
                                 class="mt-6 w-full py-4 rounded-xl font-bold transition-all
                                 ${selected.length === q.maxSelect 
                                     ? 'bg-sky-600 text-white hover:bg-sky-700' 
                                     : 'bg-slate-200 text-slate-400 cursor-not-allowed'}"
                                 ${selected.length !== q.maxSelect ? 'disabled' : ''}>
-                                Comprobar respuesta (selected.length/{q.maxSelect})
+                                Comprobar respuesta (${selected.length}/${q.maxSelect})
                             </button>
-                          ` : ''}
+                        ` : ''}
 
-                        ${/* Explicación + siguiente (cuando falló) */
-                          state.selectedAnswer !== null && state.isAnswerCorrect === false ? `
+                        ${state.selectedAnswer !== null && state.isAnswerCorrect === false ? `
                             <div class="mt-6 p-5 bg-amber-50 border border-amber-200 rounded-xl">
                                 <p class="font-bold text-amber-800 mb-2">Explicación:</p>
                                 <p class="text-slate-700">${q.explanation}</p>
@@ -579,7 +629,7 @@
                             <button onclick="nextQuestion()" class="mt-6 w-full bg-emerald-600 text-white py-4 rounded-xl font-bold hover:bg-emerald-700 transition-all">
                                 Siguiente pregunta
                             </button>
-                          ` : ''}
+                        ` : ''}
                     </div>
                 </div>`;
             }
@@ -605,4 +655,3 @@
     </script>
 </body>
 </html>
-
